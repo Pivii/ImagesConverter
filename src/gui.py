@@ -505,7 +505,7 @@ class ImageConverterGUI(QMainWindow):
         return self.compression_level
 
 def is_format_supported(image_path):
-    supported_formats = ['.jpeg', '.jpg', '.png', '.webp']
+    supported_formats = ['.jpeg', '.jpg', '.png', '.webp', '.svg']
     _, ext = os.path.splitext(image_path)
     if ext.lower() in supported_formats:
         return True
