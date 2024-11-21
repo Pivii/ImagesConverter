@@ -7,7 +7,8 @@ ImagesConverter is a simple Python GUI application designed for converting image
 Easily convert your images with a simple drag-and-drop into formats:
 - JPEG;
 - WEBP;
-- PNG.
+- PNG;
+- SVG (conversion from SVG to other formats).
 
 Superfluous metadata from your images is automatically removed during conversion.
 
