@@ -2,6 +2,8 @@ from PIL import Image
 import os
 import subprocess
 import shutil
+from cairosvg import svg2png
+from io import BytesIO
 
 def is_same_format(target_format, image_path):
     _, ext = os.path.splitext(image_path)
@@ -14,6 +16,12 @@ def has_transparency_image(image):
         if 'transparency' in image.info:
             return True
     return False
+
+def convert_svg_to_image(svg_path):
+    with open(svg_path, 'rb') as svg_file:
+        svg_data = svg_file.read()
+        png_data = svg2png(bytestring=svg_data)
+        return Image.open(BytesIO(png_data))
 
 def convert_to(image_format: str, image_paths, compression_level=None, output_path=None, log_func=None):
     image_format = image_format.lower()
@@ -30,7 +38,14 @@ def convert_to(image_format: str, image_paths, compression_level=None, output_pa
                 if log_func:
                     log_func(f"{image_path} is not a valid file!")
                 continue
-            with Image.open(image_path) as image:
+
+            # Gestion spéciale pour les fichiers SVG
+            if image_path.lower().endswith('.svg'):
+                image = convert_svg_to_image(image_path)
+            else:
+                image = Image.open(image_path)
+
+            with image:
                 if image_format == 'jpeg' and has_transparency_image(image):
                     if log_func:
                         log_func(f"Failed to convert {file_name} to JPEG: image contains transparency.")
@@ -43,7 +58,6 @@ def convert_to(image_format: str, image_paths, compression_level=None, output_pa
                     image_output_path = os.path.splitext(image_path)[0] + '.' + image_format
 
                 save_kwargs = get_compression_kwargs(image_format, compression_level)
-
                 save_image(image, image_output_path, image_format, save_kwargs)
 
                 if image_path == image_output_path:
